@@ -12,15 +12,15 @@ http://www.roguebasin.com/index.php?title=Complete_roguelike_tutorial_using_C%2B
 
 ## Controls
 
-> UP, DOWN, LEFT, RIGHT or 8,2,4,6 -> movement
-> I -> inventory/use key
-> G -> pick up item
-> 5 -> wait a turn
+ - UP, DOWN, LEFT, RIGHT or 8,2,4,6 -> movement
+ - I -> inventory/use key
+ - G -> pick up item
+ - 5 -> wait a turn
 
 ## Requirements
 
-- [SDL](https://www.libsdl.org/)
-- [LIBTCOD (1.5.2)](http://roguecentral.org/doryen/libtcod/)
+ - [SDL](https://www.libsdl.org/)
+ - [LIBTCOD (1.5.2)](http://roguecentral.org/doryen/libtcod/)
 
 ## Building
 
