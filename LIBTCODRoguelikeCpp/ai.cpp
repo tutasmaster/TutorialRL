@@ -9,6 +9,11 @@ void PlayerAi::update(Actor * owner)
 	
 	TCOD_key_t key = TCODConsole::checkForKeypress(TCOD_KEY_RELEASED);
 
+	if (looking) {
+		lookUpdate(owner,key);
+		return;
+	}
+
 	int mx = 0;
 	int my = 0; //Movement X and Movement Y
 
@@ -70,13 +75,33 @@ void PlayerAi::update(Actor * owner)
 				engine.nextLevel();
 			}
 		}
+		else if (key.c == 'l') {
+			look(owner,true);
+		}
 		break;
 	}
 
 	move(owner,owner->x + mx,owner->y + my);
 
-	if (mx != 0 || my != 0 || key.vk == TCODK_KP5) {
+	if (mx != 0 || my != 0 || key.vk == TCODK_KP5 || key.c == '.') {
 		engine.status = engine.acting;
+	}
+}
+
+void PlayerAi::renderGUI(Actor * owner)
+{
+	if (looking) {
+		TCODConsole::root->setDefaultForeground(TCODColor::lightCyan);
+		TCODConsole::root->printFrame(67, 0, 13, 7);
+		int i = 0;
+		for (auto const& a : engine.actors) {
+			if (a != owner && a->x == owner->x && a->y == owner->y && engine.map->isInFov(a->x, a->y)) {
+				TCODConsole::root->setDefaultForeground(a->col);
+				TCODConsole::root->print(68, 1 + i, a->name.c_str());
+				i++;
+			}
+			
+		}
 	}
 }
 
@@ -94,7 +119,7 @@ bool PlayerAi::move(Actor * owner, int tx, int ty)
 				Message * msg;
 				;
 				if (owner->attacker->attack(owner, a)) {
-					msg = new Message(name + "dies to your blow!", TCODColor::green);
+					msg = new Message(name + " dies from your blow!", TCODColor::red);
 				}
 				else {
 					msg = new Message("You hit " + name + "!", TCODColor::white);
@@ -113,6 +138,74 @@ bool PlayerAi::move(Actor * owner, int tx, int ty)
 	}
 
 	return false;
+}
+
+void PlayerAi::look(Actor *owner, bool toggle)
+{
+	if (toggle == true) {
+		looking = true;
+		lastX = owner->x;
+		lastY = owner->y;
+		owner->ch = '+';
+		owner->col = TCODColor::yellow;
+	}
+	else {
+		looking = false;
+		owner->x = lastX;
+		owner->y = lastY;
+		owner->ch = '@';
+		owner->col = TCODColor::white;
+	}
+}
+
+void PlayerAi::lookUpdate(Actor *owner, TCOD_key_t key)
+{
+	int mx = 0;
+	int my = 0;
+
+	switch (key.vk) {
+	case TCODK_UP: case TCODK_KP8:
+		my -= 1;
+		break;
+	case TCODK_DOWN: case TCODK_KP2:
+		my += 1;
+		break;
+	case TCODK_LEFT: case TCODK_KP4:
+		mx -= 1;
+		break;
+	case TCODK_RIGHT: case TCODK_KP6:
+		mx += 1;
+		break;
+
+	case TCODK_KP7:
+		mx -= 1;
+		my -= 1;
+		break;
+
+	case TCODK_KP9:
+		mx += 1;
+		my -= 1;
+		break;
+
+	case TCODK_KP1:
+		mx -= 1;
+		my += 1;
+		break;
+
+	case TCODK_KP3:
+		mx += 1;
+		my += 1;
+		break;
+	case TCODK_CHAR:
+		if (key.c == 'l') {
+			look(owner, false);
+		}
+		return;
+		break;
+	}
+
+	owner->x += mx;
+	owner->y += my;
 }
 
 Actor * PlayerAi::getItemFromInventory(Actor * owner)

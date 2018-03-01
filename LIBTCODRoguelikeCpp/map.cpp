@@ -80,7 +80,7 @@ void Map::addMonster(int x, int y) {
 	if (rng->getInt(0, 100) < 80) {
 		// create an orc
 		Actor *orc = new Actor(x, y,true, 'o', "Orc",
-			TCODColor::desaturatedGreen);
+			TCODColor::darkRed);
 		orc->destructible = new Destructible(10, 0,35, "Dead Orc");
 		orc->attacker = new Attacker(30);
 		orc->ai = new EnemyAi();
@@ -89,7 +89,7 @@ void Map::addMonster(int x, int y) {
 	else {
 		// create a troll
 		Actor *troll = new Actor(x, y, true, 'T', "Troll",
-			TCODColor::darkerGreen);
+			TCODColor::darkRed);
 		troll->destructible = new Destructible(60, 1, 100, "Troll Carcass" );
 		troll->attacker = new Attacker(50);
 		troll->ai = new EnemyAi();
@@ -102,7 +102,7 @@ void Map::addItem(int x, int y) {
 	int dice = rng->getInt(0, 100);
 	if (dice < 70) {
 		// create a health potion
-		Actor *healthPotion = new Actor(x, y,false, '!', "Potion",TCODColor::violet);
+		Actor *healthPotion = new Actor(x, y,false, '!', "Potion",TCODColor::green);
 		healthPotion->solid = false;
 		healthPotion->pickable = new Pickable();
 		engine.actors.insertBefore(healthPotion,0);

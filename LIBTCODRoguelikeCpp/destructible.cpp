@@ -27,6 +27,7 @@ void Destructible::die(Actor * owner)
 	delete owner->attacker;
 	owner->ai = NULL;
 	owner->attacker = NULL;
+	owner->name = this->name;
 	owner->ch = '.';
 	owner->solid = false;
 

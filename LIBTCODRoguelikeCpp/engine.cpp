@@ -35,7 +35,7 @@ void Engine::render()
 {
 	TCODConsole::root->clear();
 	con.clear();
-	map->computeFov();
+	if (status == acting) 	map->computeFov();
 	map->render();
 	for (auto const& a : actors) {
 		if (a != player
@@ -48,7 +48,7 @@ void Engine::render()
 
 	TCODConsole::blit(&con, 0, 0, 67, 36, TCODConsole::root, 0, 7);
 
-	TCODConsole::root->setDefaultForeground(TCODColor::lightBlue);
+	TCODConsole::root->setDefaultForeground(TCODColor::lightCyan);
 	TCODConsole::root->printFrame(67, 0, 13, 7);
 	TCODConsole::root->setDefaultForeground(TCODColor::green);
 	TCODConsole::root->print(68, 1, "Player");
@@ -74,9 +74,11 @@ void Engine::render()
 	for (int i = 0; i < 5; i++) {
 		if(log.size() > i){
 			TCODConsole::root->setDefaultForeground(log.get(log.size() - i - 1)->col);
-			TCODConsole::root->print(1, i + 1, log.get(log.size() - i - 1)->text.c_str());
+			TCODConsole::root->print((65/2) - (log.get(log.size() - i - 1)->text.size()/2), i + 1, log.get(log.size() - i - 1)->text.c_str());
 		}
 	}
+
+	player->ai->renderGUI(player);
 }
 
 void Engine::update()
