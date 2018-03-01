@@ -102,6 +102,8 @@ void PlayerAi::renderGUI(Actor * owner)
 			}
 			
 		}
+
+		TCODConsole::root->print(lastX,lastY + 7, "@");
 	}
 }
 
@@ -204,8 +206,10 @@ void PlayerAi::lookUpdate(Actor *owner, TCOD_key_t key)
 		break;
 	}
 
-	owner->x += mx;
-	owner->y += my;
+	if(engine.map->isInFov(owner->x + mx,owner->y)){
+		owner->x += mx;
+		owner->y += my;
+	}
 }
 
 Actor * PlayerAi::getItemFromInventory(Actor * owner)
