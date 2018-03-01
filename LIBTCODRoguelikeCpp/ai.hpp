@@ -10,7 +10,7 @@ public:
 
 class PlayerAi : public Ai
 {
-	int lastX, lastY;
+	int lookX, lookY,scroll;
 	bool looking = false;
 
 	void update(Actor *owner) override;

@@ -78,6 +78,12 @@ void PlayerAi::update(Actor * owner)
 		else if (key.c == 'l') {
 			look(owner,true);
 		}
+		else if (key.c == 'd') {
+			Actor* a = getItemFromInventory(owner);
+			if (a != NULL && a->pickable) {
+				a->pickable->drop(a, owner);
+			}
+		}
 		break;
 	}
 
@@ -94,16 +100,35 @@ void PlayerAi::renderGUI(Actor * owner)
 		TCODConsole::root->setDefaultForeground(TCODColor::lightCyan);
 		TCODConsole::root->printFrame(67, 0, 13, 7);
 		int i = 0;
+
+		if (scroll < 0) scroll = 0;
+
 		for (auto const& a : engine.actors) {
-			if (a != owner && a->x == owner->x && a->y == owner->y && engine.map->isInFov(a->x, a->y)) {
-				TCODConsole::root->setDefaultForeground(a->col);
-				TCODConsole::root->print(68, 1 + i, a->name.c_str());
+			if (a != owner && a->x == lookX && a->y == lookY){
+				if (engine.map->isInFov(a->x, a->y) && i >= scroll && i <= 4 + scroll) {
+					TCODConsole::root->setDefaultForeground(a->col);
+					TCODConsole::root->print(68, 1 + i - scroll, a->name.c_str());
+				}
 				i++;
 			}
 			
 		}
+		TCODConsole::root->setDefaultForeground(TCODColor::yellow);
+		TCODConsole::root->print(lookX,lookY + 7, "+");
 
-		TCODConsole::root->print(lastX,lastY + 7, "@");
+
+
+		if (i - 5 - scroll >= 1) {
+			TCODConsole::root->setDefaultForeground(TCODColor::white);
+			TCODConsole::root->print(78, 6, "D");
+		}
+
+		if (scroll > 0) {
+			TCODConsole::root->setDefaultForeground(TCODColor::white);
+			TCODConsole::root->print(78, 0, "U");
+		}
+
+		if (i - 5 - scroll < 0) scroll = 0;
 	}
 }
 
@@ -146,17 +171,12 @@ void PlayerAi::look(Actor *owner, bool toggle)
 {
 	if (toggle == true) {
 		looking = true;
-		lastX = owner->x;
-		lastY = owner->y;
-		owner->ch = '+';
-		owner->col = TCODColor::yellow;
+		scroll = 0;
+		lookX = owner->x;
+		lookY = owner->y;
 	}
 	else {
 		looking = false;
-		owner->x = lastX;
-		owner->y = lastY;
-		owner->ch = '@';
-		owner->col = TCODColor::white;
 	}
 }
 
@@ -203,12 +223,17 @@ void PlayerAi::lookUpdate(Actor *owner, TCOD_key_t key)
 			look(owner, false);
 		}
 		return;
+	case TCODK_KPADD:
+		scroll++;
+		break;
+	case TCODK_KPSUB:
+		scroll--;
 		break;
 	}
 
-	if(engine.map->isInFov(owner->x + mx,owner->y)){
-		owner->x += mx;
-		owner->y += my;
+	if(engine.map->isInFov(lookX + mx, lookY + my)){
+		lookX += mx;
+		lookY += my;
 	}
 }
 

@@ -214,6 +214,7 @@ void Map::computeFov() {
 void Map::render() const {
 	for (int x = 0; x < width; x++) {
 		for (int y = 0; y < height; y++) {
+
 			int distance = sqrt(((engine.player->x - x) * (engine.player->x - x)) + ((engine.player->y - y) * (engine.player->y - y)));
 			TCODColor lightGround(200, 180, 50);
 			lightGround.setHue(60 - (distance*4));

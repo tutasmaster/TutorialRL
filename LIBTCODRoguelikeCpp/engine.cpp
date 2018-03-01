@@ -78,7 +78,7 @@ void Engine::render()
 		}
 	}
 
-	player->ai->renderGUI(player);
+	if(player->ai) player->ai->renderGUI(player);
 }
 
 void Engine::update()

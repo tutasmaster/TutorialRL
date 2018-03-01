@@ -13,9 +13,11 @@ http://www.roguebasin.com/index.php?title=Complete_roguelike_tutorial_using_C%2B
 ## Controls
 
  - UP, DOWN, LEFT, RIGHT or 8,2,4,6 -> movement
- - I -> inventory/use key
+ - I -> inventory/use
  - G -> pick up item
  - 5 -> wait a turn
+ - D -> drop item
+ - L -> look around
 
 ## Requirements
 
