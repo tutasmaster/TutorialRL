@@ -7,17 +7,16 @@
 void PlayerAi::update(Actor * owner)
 {
 	
-	TCOD_key_t key = TCODConsole::checkForKeypress(TCOD_KEY_RELEASED);
 
 	if (looking) {
-		lookUpdate(owner,key);
+		lookUpdate(owner, engine.lastKey);
 		return;
 	}
 
 	int mx = 0;
 	int my = 0; //Movement X and Movement Y
 
-	switch (key.vk) {
+	switch (engine.lastKey.vk) {
 	case TCODK_UP: case TCODK_KP8:
 		my -= 1;
 		break;
@@ -52,13 +51,13 @@ void PlayerAi::update(Actor * owner)
 		break;
 	
 	case TCODK_CHAR:
-		if (key.c == 'i'){
+		if (engine.lastKey.c == 'i'){
 			Actor* a = getItemFromInventory(owner);
 			if (a != NULL && a->pickable) {
 				a->pickable->use(a, owner);
 			}
 		}
-		else if (key.c == 'g') {
+		else if (engine.lastKey.c == 'g') {
 			for (auto const& a : engine.actors) {
 				if (a != owner && a->x == owner->x && a->y == owner->y) {
 					if (a->pickable) {
@@ -70,15 +69,15 @@ void PlayerAi::update(Actor * owner)
 				}
 			}
 		}
-		else if (key.c == '>') {
+		else if (engine.lastKey.c == '>') {
 			if (owner->x == engine.stairs->x && owner->y == engine.stairs->y) {
 				engine.nextLevel();
 			}
 		}
-		else if (key.c == 'l') {
+		else if (engine.lastKey.c == 'l') {
 			look(owner,true);
 		}
-		else if (key.c == 'd') {
+		else if (engine.lastKey.c == 'd') {
 			Actor* a = getItemFromInventory(owner);
 			if (a != NULL && a->pickable) {
 				a->pickable->drop(a, owner);
@@ -89,7 +88,7 @@ void PlayerAi::update(Actor * owner)
 
 	move(owner,owner->x + mx,owner->y + my);
 
-	if (mx != 0 || my != 0 || key.vk == TCODK_KP5 || key.c == '.') {
+	if (mx != 0 || my != 0 || engine.lastKey.vk == TCODK_KP5 || engine.lastKey.c == '.') {
 		engine.status = engine.acting;
 	}
 }
@@ -397,4 +396,81 @@ bool FriendAi::move(Actor * owner, int tx, int ty)
 	}
 
 	return false;
+}
+
+void ArrowAi::update(Actor * owner)
+{
+	int mx = 0;
+	int my = 0;
+	if (owner->name == "u") {
+		my = -1;
+	}
+	else if (owner->name == "d") {
+		my = 1;
+	}
+	else if (owner->name == "l") {
+		mx = -1;
+	}
+	else if (owner->name == "r") {
+		mx = 1;
+	}
+
+	if (engine.map->isWall(owner->x + mx, owner->y + my)) {
+		engine.actors.remove(owner);
+		delete owner;
+	}
+	else {
+		owner->x += mx;
+		owner->y += my;
+	}
+
+	if(owner->name != "Arrow"){
+		for (auto const& a : engine.actors) {
+			if (a != owner && a->x == owner->x && a->y == owner->y && a->solid) {
+				if (a->destructible) {
+					owner->name = "Arrow";
+					owner->attacker->attack(owner, a);
+				}
+				engine.actors.remove(owner);
+				delete owner;
+			}
+		}
+	}
+}
+
+void ArrowAi::renderGUI(Actor * owner)
+{
+	turns++;
+	bool update = false;
+	int mx = 0;
+	int my = 0;
+	if (owner->name == "u") {
+		my = -1;
+		update = true;
+	}
+	else if (owner->name == "d") {
+		my = 1;
+		update = true;
+	}
+	else if (owner->name == "l") {
+		mx = -1;
+		update = true;
+	}
+	else if (owner->name == "r") {
+		mx = 1;
+		update = true;
+	}
+
+	if (turns == 30) {
+		turns = 0;
+	}
+
+	std::string n = "V";
+
+	if (turns > 15) n = "X";
+
+	if (engine.map->isInFov(owner->x - mx, owner->y - my) && update) {
+		TCODConsole::root->setDefaultForeground(TCODColor::yellow);
+		TCODConsole::root->print(owner->x - mx, owner->y + 7 - my,n.c_str());
+	}
 }

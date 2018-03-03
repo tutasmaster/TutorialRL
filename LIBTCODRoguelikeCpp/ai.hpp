@@ -38,3 +38,10 @@ class FriendAi : public Ai
 	void renderGUI(Actor * owner) {};
 	bool move(Actor *owner, int tx, int ty);
 };
+
+class ArrowAi : public Ai
+{
+	int turns = 0;
+	void update(Actor *owner) override;
+	void renderGUI(Actor * owner);
+};

@@ -25,3 +25,13 @@ public:
 	void drop(Actor *owner, Actor *wearer);
 	virtual bool use(Actor *owner, Actor *wearer);
 };
+
+class HealthPickable : public Pickable
+{
+	bool use(Actor *owner, Actor *wearer) override;
+};
+
+class BowPickable : public Pickable
+{
+	bool use(Actor *owner, Actor *wearer) override;
+};

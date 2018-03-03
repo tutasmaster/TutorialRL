@@ -17,6 +17,9 @@ struct Message {
 class Engine
 {
 public:
+
+	TCOD_key_t lastKey;
+
 	enum EngineStatus {
 		menu,
 		startup,

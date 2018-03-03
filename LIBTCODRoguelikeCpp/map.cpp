@@ -100,29 +100,30 @@ void Map::addMonster(int x, int y) {
 void Map::addItem(int x, int y) {
 	TCODRandom *rng = TCODRandom::getInstance();
 	int dice = rng->getInt(0, 100);
-	if (dice < 70) {
+	if (dice < 60) {
 		// create a health potion
 		Actor *healthPotion = new Actor(x, y,false, '!', "Potion",TCODColor::green);
 		healthPotion->solid = false;
-		healthPotion->pickable = new Pickable();
+		healthPotion->pickable = new HealthPickable();
 		engine.actors.insertBefore(healthPotion,0);
 	}
-	/*else if (dice < 70 + 10) {
-		// create a scroll of lightning bolt 
-		Actor *scrollOfLightningBolt = new Actor(x, y, '#', "scroll of lightning bolt",
+	else if (dice < 60 + 20) {
+		// create a bow
+		Actor *bow = new Actor(x, y,false, ')', "Bow",
 			TCODColor::lightYellow);
-		scrollOfLightningBolt->solid = false;
-		scrollOfLightningBolt->pickable = new LightningBolt(5, 20);
-		engine.actors.push(scrollOfLightningBolt);
+		bow->pickable = new BowPickable ();
+		bow->attacker = new Attacker(60);
+		engine.actors.push(bow);
 	}
-	else if (dice < 70 + 10 + 10) {
+	else if (dice < 60 + 40) {
 		// create a scroll of fireball
-		Actor *scrollOfFireball = new Actor(x, y, '#', "scroll of fireball",
-			TCODColor::lightYellow);
-		scrollOfFireball->solid = false;
-		scrollOfFireball->pickable = new Fireball(3, 12);
-		engine.actors.push(scrollOfFireball);
-	}
+		Actor *arrow = new Actor(x, y, false, '-', "Arrow",
+			TCODColor::white);
+		arrow->ai = new ArrowAi();
+		arrow->attacker = new Attacker(60);
+		arrow->pickable = new Pickable();
+		engine.actors.push(arrow);
+	}/*
 	else {
 		// create a scroll of confusion
 		Actor *scrollOfConfusion = new Actor(x, y, '#', "scroll of confusion",

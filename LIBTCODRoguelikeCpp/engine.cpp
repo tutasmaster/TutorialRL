@@ -15,7 +15,6 @@ Engine::~Engine()
 void Engine::init()
 {
 
-
 	player = new Actor(40, 25,true, '@', "Player", TCODColor::white);
 	player->ai = new PlayerAi();
 	player->destructible = new Destructible(100,20,10,"Corpse");
@@ -79,10 +78,17 @@ void Engine::render()
 	}
 
 	if(player->ai) player->ai->renderGUI(player);
+
+	for (auto const& a : actors) {
+		if (a->ai != NULL) {
+			a->ai->renderGUI(a);
+		}
+	}
 }
 
 void Engine::update()
 {
+	lastKey = TCODConsole::checkForKeypress(TCOD_KEY_PRESSED);
 	if (status == startup) map->computeFov();
 	status = idle;
 
