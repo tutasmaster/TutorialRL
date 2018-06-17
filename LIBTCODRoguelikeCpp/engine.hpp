@@ -19,7 +19,7 @@ class Engine
 public:
 
 	TCOD_key_t lastKey;
-
+	TCODImage img;
 	enum EngineStatus {
 		menu,
 		startup,
@@ -32,6 +32,7 @@ public:
 	Engine();
 	~Engine();
 
+	void term();
 	void init();
 	void render();
 	void update();

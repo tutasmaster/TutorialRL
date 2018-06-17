@@ -53,8 +53,8 @@ void Map::init(bool withActors) {
 }
 
 Map::~Map() {
-	delete[] tiles;
-	delete map;
+	delete [] tiles;
+	map->clear();
 }
 
 void Map::dig(int x1, int y1, int x2, int y2) {

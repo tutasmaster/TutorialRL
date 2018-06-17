@@ -416,6 +416,18 @@ void ArrowAi::update(Actor * owner)
 	}
 
 	if (engine.map->isWall(owner->x + mx, owner->y + my)) {
+
+		for (int i = owner->x - 5; i < owner->x + 5; i++) {
+			for (int j = owner->y - 5; j < owner->y + 5; j++) {
+				int ix = i - owner->x - 5;
+				int iy = i - owner->y - 5;
+				
+				if (sqrt((ix * ix) + (iy * iy)) > 2) {
+					engine.map->dig(i, j, i, j);
+				}
+			}
+		}
+
 		engine.actors.remove(owner);
 		delete owner;
 	}
