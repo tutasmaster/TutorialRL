@@ -1,165 +1,157 @@
 #include "engine.hpp"
 
 
-Engine::Engine() : status(acting), con(71, 38), img("GameOver.png")
+Engine::Engine()
 {
-	TCODConsole::initRoot(80, 43, "Ven L' King");
+	TCODConsole::initRoot(16, 16, "Roguelike");
+	
+	yPosition = 1;
+
+	map = new int[16*16*16];
+
+	for (int i = 0; i < 16 * 16 * 16; i++) {
+		map[i] = 0;
+	}
+
+	for (int i = 0; i < 16; i++) {
+		for (int j = 0; j < 16; j++) {
+			map[(i) + (j * 16)] = 1;
+		}
+	}
+
+	for (int i = 1; i < 15; i++) {
+		for (int j = 1; j < 15; j++) {
+			map[(i) + (j * 16) + (1 * 256)] = 1;
+		}
+	}
+
+	for (int i = 2; i < 14; i++) {
+		for (int j = 2; j < 14; j++) {
+			map[(i)+(j * 16) + (2 * 256)] = 1;
+		}
+	}
+
+	for (int i = 3; i < 13; i++) {
+		for (int j = 3; j < 13; j++) {
+			map[(i)+(j * 16) + (3 * 256)] = 1;
+		}
+	}
+
+	for (int i = 4; i < 12; i++) {
+		for (int j = 4; j < 12; j++) {
+			map[(i)+(j * 16) + (4 * 256)] = 1;
+		}
+	}
+
+	for (int i = 5; i < 11; i++) {
+		for (int j = 5; j < 11; j++) {
+			map[(i)+(j * 16) + (5 * 256)] = 1;
+		}
+	}
+
+	for (int i = 6; i < 10; i++) {
+		for (int j = 6; j < 10; j++) {
+			map[(i)+(j * 16) + (6 * 256)] = 1;
+		}
+	}
+
+	for (int i = 7; i < 9; i++) {
+		for (int j = 7; j < 9; j++) {
+			map[(i)+(j * 16) + (7 * 256)] = 1;
+		}
+	}
+
+	for (int i = 0; i < 16; i++) {
+		map[(i)+(8 * 16) + (2 * 256)] = 0;
+
+		map[(i)+(8 * 16) + (7 * 256)] = 1;
+	}
 }
+
+
 
 
 Engine::~Engine()
 {
-	if (map) delete map;
+
 }
 
 void Engine::term()
 {
-	actors.clearAndDelete();
-	delete player;
-	if (map) delete map;
+
 }
 
 void Engine::init()
 {
 
-	player = new Actor(40, 25,true, '@', "Player", TCODColor::white);
-	player->ai = new PlayerAi();
-	player->destructible = new Destructible(100,20,10,"Corpse");
-	player->attacker = new Attacker(50);
-	player->container = new Container(29);
-
-	stairs = new Actor(0, 0, false, '>', "stairs", TCODColor::white);
-	stairs->fovOnly = false;
-	actors.push(stairs);
-
-	map = new Map(67, 36);
-	map->init(true);
-	map->computeFov();
 }
 
 void Engine::render()
 {
 	TCODConsole::root->clear();
-	if(status != menu && status != victory && status != death){
-		con.clear();
-		if (status == acting) 	map->computeFov();
-		map->render();
-		for (auto const& a : actors) {
-			if (a != player
-				&& ((!a->fovOnly && map->isExplored(a->x, a->y))
-					|| map->isInFov(a->x, a->y))) {
-				a->render();
+
+
+	for (int i = 0; i < 16; i++) {
+		for (int j = 0; j < 16; j++) {
+			int value = map[(i) + (j * 16) + (yPosition * 256)];
+			int topValue = map[(i)+(j * 16) + ((yPosition + 1) * 256)];
+
+			TCODConsole::root->setDefaultForeground(TCODColor::grey);
+
+			if (value == 0) {
+				TCODConsole::root->setChar(i, j, ' ');
 			}
-		}
-		player->render();
-
-		TCODConsole::blit(&con, 0, 0, 67, 36, TCODConsole::root, 0, 7);
-
-		TCODConsole::root->setDefaultForeground(TCODColor::lightCyan);
-		TCODConsole::root->printFrame(67, 0, 13, 7);
-		TCODConsole::root->setDefaultForeground(TCODColor::green);
-		TCODConsole::root->print(68, 1, "Player");
-		TCODConsole::root->setDefaultForeground(TCODColor::white);
-		if (player->destructible) TCODConsole::root->print(68, 3, "HP: %d/%d", player->destructible->curHP, player->destructible->maxHP);
-		if(player->attacker) TCODConsole::root->print(68, 4, "AP: %d", player->attacker->AP);
-	
-		if(player->destructible) TCODConsole::root->print(68, 5, "DP: %d", player->destructible->DP);
-
-		TCODConsole::root->setDefaultForeground(TCODColor::red);
-		TCODConsole::root->printFrame(67, 7, 13, 35);
-		TCODConsole::root->setDefaultForeground(TCODColor::green);
-		TCODConsole::root->print(68, 9, "Inventory %d", player->container->inventory.size());
-
-		if(player->container)
-		for (int i = 0; i < player->container->inventory.size(); i++) {
-			TCODConsole::root->setDefaultForeground(player->container->inventory.get(i)->col);
-			TCODConsole::root->print((68)+((11 - player->container->inventory.get(i)->name.size())/2), i + 11, player->container->inventory.get(i)->name.c_str());
-		}
-		TCODConsole::root->setDefaultForeground(TCODColor::white);
-		TCODConsole::root->printFrame(0, 0, 67, 7);
-
-		for (int i = 0; i < 5; i++) {
-			if(log.size() > i){
-				TCODConsole::root->setDefaultForeground(log.get(log.size() - i - 1)->col);
-				TCODConsole::root->print((65/2) - (log.get(log.size() - i - 1)->text.size()/2), i + 1, log.get(log.size() - i - 1)->text.c_str());
+			else if(topValue == 0 && value == 1){
+				TCODConsole::root->setChar(i, j, '#');
 			}
-		}
-
-		if(player->ai) player->ai->renderGUI(player);
-
-		for (auto const& a : actors) {
-			if (a->ai != NULL) {
-				a->ai->renderGUI(a);
+			else if(value == 1){
+				TCODConsole::root->setChar(i, j, '.');
 			}
 		}
 	}
-	else if (status == death) {
-		img.blit2x(TCODConsole::root, 0, 0);
-	}
+
+	TCODConsole::root->setChar(x, y, '@');
 }
 
 void Engine::update()
 {
 	lastKey = TCODConsole::checkForKeypress(TCOD_KEY_PRESSED);
-	if (status != menu && status != victory && status != death) {
-		
-		if (status == startup) map->computeFov();
-		status = idle;
 
-		player->update();
-
-		if (status == acting) {
-			for (auto const& a : actors) {
-				a->update();
-			}
-		}
-		if (!player->destructible) {
-			status = death;
-		}
+	if (lastKey.c == '<') {
+		if (yPosition != 0)
+			yPosition--;
 	}
-	else if(status == death){
-		if (lastKey.c == 'y'){
-			term();
-			init();
-		}
-		else if (lastKey.c == 'n') {
-			term();
-		}
+	else if (lastKey.c == '>') {
+		yPosition++;
 	}
-}
 
-void Engine::nextLevel()
-{
-	level++;
-	player->destructible->healing(player->destructible->maxHP / 2);
-	delete map;
-	// delete all actors but player and stairs
-	for (Actor **it = actors.begin(); it != actors.end(); it++) {
-		if (*it != player && *it != stairs) {
-			delete *it;
-			it = actors.remove(it);
+	if (lastKey.vk == TCODK_UP) {
+		y--;
+	}
+	else if (lastKey.vk == TCODK_DOWN) {
+		y++;
+	}
+
+	if (lastKey.vk == TCODK_LEFT) {
+		x--;
+	}
+	else if (lastKey.vk == TCODK_RIGHT) {
+		x++;
+	}
+
+	int value = map[(x)+(y * 16) + ((yPosition+1) * 256)];
+
+	if (value == 1) {
+		yPosition++;
+	}
+	else if (value == 0) {
+		int bottomValue = map[(x)+(y * 16) + ((yPosition) * 256)];
+
+		while (bottomValue == 0) {
+			yPosition--;
+			bottomValue = map[(x)+(y * 16) + ((yPosition) * 256)];
 		}
 	}
 
-	log.clear();
 
-	map = new Map(67, 36);
-	map->init(true);
-
-	status = startup;
-}
-
-void Engine::addMsg(Message * text)
-{
-	log.push(text);
-}
-
-Message::Message(std::string text, const TCODColor & col) : text(text), col(col)
-{
-
-}
-
-Message::~Message()
-{
-	text.clear();
 }
