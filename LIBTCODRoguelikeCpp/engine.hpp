@@ -3,6 +3,8 @@
 #include <libtcod.hpp>
 #include <vector>
 
+#include "Map.h"
+
 class Engine
 {
 public:
@@ -10,7 +12,7 @@ public:
 	int x, y;
 	int yPosition;
 
-	int *map;
+	Map map;
 
 	TCOD_key_t lastKey;
 
