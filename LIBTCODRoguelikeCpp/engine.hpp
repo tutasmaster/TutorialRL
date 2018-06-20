@@ -1,7 +1,6 @@
 #pragma once
 
-#include <libtcod.hpp>
-#include <vector>
+#include "Error.h"
 
 #include "Map.h"
 

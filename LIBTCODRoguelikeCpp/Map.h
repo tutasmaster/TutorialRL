@@ -2,9 +2,43 @@
 
 #include <libtcod.hpp>
 
+#include <vector>
+
+#define TILE_EMPTY 0
+#define TILE_WALL 1
+#define TILE_FLOOR 2
+
 class Map
 {
 public:
+
+	class Tile {
+	public:
+		enum Type {
+			empty,
+			wall,
+			floor
+		} type = empty;
+
+		TCODColor bg = TCODColor::black;
+		TCODColor color = TCODColor::white;
+
+		int shadeLimit = 5;
+
+		char c = '.';
+
+	};
+
+	typedef int TileID;
+
+	class TileManager {
+	public:
+		TileManager();
+		Tile* GetTileData(TileID tile);
+		std::vector<Tile> tiles;
+	};
+
+	TileManager tm;
 
 	class Pos {
 	public:
@@ -19,37 +53,24 @@ public:
 		int d;
 	};
 
-	class Tile {
-
-	public: 
-
-		enum Type {
-			wall,
-			empty,
-			walkable
-		} type = empty;
-
-		TCODColor color = TCODColor::lightGrey;
-		TCODColor bg = TCODColor::black;
-		int shadeLimit = 5;
-		char c = ' ';
-	};
-
 	Map(int w, int h, int d);
 	~Map();
 
 	Tile* GetTileAt(Pos p);
 	Tile* GetTileAt(int w, int h, int d);
 
-	bool SetTileAt(const Pos p, Tile &tile);
-	bool SetTileAt(const int w, const int h, const int d, Tile &tile);
+	bool SetTileAt(const Pos p, TileID tile);
+	bool SetTileAt(const int w, const int h, const int d, TileID tile);
 
 	bool isTilePosValid(const Pos p);
 	bool isTilePosValid(const int w, const int h, const int d);
 
-	Tile * arr;
+	TileID * arr;
 
 	int width, height, depth;
 
 };
 
+void SetMapLayer(Map& m, int l, Map::TileID tile);
+
+void DrawSquareOnMap(Map& m, int x, int y, int w, int h, int d, Map::TileID tile);

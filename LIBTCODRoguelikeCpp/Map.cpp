@@ -1,10 +1,38 @@
 #include "Map.h"
 
+Map::TileManager::TileManager() : tiles(){
+	Tile empty;
+	empty.c = ' ';
+	tiles.push_back(empty);
 
+	Tile wall;
+	wall.c = ' ';
+	wall.bg = TCODColor::white;
+	wall.color = TCODColor::black;
+	wall.type = wall.wall;
+	tiles.push_back(wall);
 
-Map::Map(int w = 255, int h = 255, int d = 255) : width(w) , height(h) , depth(d)
+	Tile floor;
+	floor.c = '.';
+	floor.bg = TCODColor::black;
+	floor.color = TCODColor::white;
+	floor.type = floor.floor;
+	tiles.push_back(floor);
+}
+
+Map::Tile* Map::TileManager::GetTileData(Map::TileID tile) {
+	if (tile < tiles.size() && tile > -1)
+		return &tiles.at(tile);
+	return nullptr;
+}
+
+Map::Map(int w = 255, int h = 255, int d = 255) : width(w) , height(h) , depth(d) , tm()
 {
-	arr = new Tile[w*h*d];
+	arr = new TileID[w*h*d];
+
+	for (int i = 0; i < w*h*d; i++) {
+		arr[i] = 0;
+	}
 }
 
 
@@ -13,26 +41,22 @@ Map::~Map()
 	delete[] arr;
 }
 
-
-
-
-Map::Tile* Map::GetTileAt(Map::Pos p) {
-	if (isTilePosValid(p))
-		return &arr[(p.w - 1) + ((p.h - 1)*width) + ((p.d - 1)*height * width)];
-
+Map::Tile* Map::GetTileAt(Pos pos) {
+	if ((pos.w > -1 && pos.h > -1 && pos.d > -1) &&
+		(pos.w < width && pos.h < height && pos.d < depth))
+		return tm.GetTileData(arr[pos.w + (pos.h * width) + (pos.d * width * height)]);
 	return nullptr;
 }
 
 Map::Tile* Map::GetTileAt(int w, int h, int d) {
-	if (isTilePosValid(w,h,d)) 
-		return &arr[(w - 1) + ((h - 1)*width) + ((d - 1)*height * width)];
-
+	if ((w > -1 && h > -1 && d > -1) &&
+		(w < width && h < height && d < depth))
+		return tm.GetTileData(arr[w + (h * width) + (d * width * height)]);
 	return nullptr;
 }
 
 
-
-bool Map::SetTileAt(const Pos p, Tile &tile) {
+bool Map::SetTileAt(const Pos p, TileID tile) {
 	if (isTilePosValid(p)) {
 		arr[(p.w - 1) + ((p.h - 1)*width) + ((p.d - 1)*height * width)] = tile;
 		return true;
@@ -40,7 +64,7 @@ bool Map::SetTileAt(const Pos p, Tile &tile) {
 	return false;
 }
 
-bool Map::SetTileAt(const int w, const int h, const int d, Tile &tile) {
+bool Map::SetTileAt(const int w, const int h, const int d, TileID tile) {
 	if(isTilePosValid(w,h,d)){
 		arr[(w - 1) + ((h - 1)*width) + ((d - 1)*height * width)] = tile;
 		return true;
@@ -88,4 +112,20 @@ Map::Pos Map::Pos::operator*(int f) {
 	n.d = f * this->d;
 
 	return n;
+}
+
+void SetMapLayer(Map& m, int l, Map::TileID tile) {
+	for (int j = 0; j < m.height; j++) {
+		for (int i = 0; i < m.width; i++) {
+			m.SetTileAt(i, j, l, tile);
+		}
+	}
+}
+
+void DrawSquareOnMap(Map& m, int x, int y, int w, int h, int d, Map::TileID tile) {
+	for (int j = y; j < h + y; j++) {
+		for (int i = x; i < w + x; i++) {
+			m.SetTileAt(i, j, d, tile);
+		}
+	}
 }

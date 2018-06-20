@@ -157,13 +157,11 @@
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="MapModifiers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine.hpp" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Map.h" />
-    <ClInclude Include="MapModifiers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
