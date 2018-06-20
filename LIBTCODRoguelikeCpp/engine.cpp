@@ -13,12 +13,29 @@ Engine::Engine() : map(255,255,255)
 	tile.type = tile.walkable;
 	tile.c = '.';
 	tile.color = TCODColor::white;
-
+	tile.bg = TCODColor::black;
 	SetMapLayer(map, 1, tile);
-	tile.type = tile.empty;
+	
+	tile.type = tile.walkable;
 	tile.c = ' ';
-	tile.color = TCODColor::black;
+	tile.color = TCODColor::white;
+	tile.bg = TCODColor::white;
+
 	DrawSquareOnMap(map, 5, 5, 10, 10, 1, tile);
+	DrawSquareOnMap(map, 5, 5, 10, 10, 2, tile);
+	DrawSquareOnMap(map, 5, 5, 10, 10, 3, tile);
+	DrawSquareOnMap(map, 5, 5, 10, 10, 4, tile);
+	DrawSquareOnMap(map, 5, 5, 10, 10, 5, tile);
+
+	tile.type = tile.walkable;
+	tile.c = '.';
+	tile.color = TCODColor::white;
+	tile.bg = TCODColor::black;
+
+	map.SetTileAt(14, 9, 1, tile);
+	map.SetTileAt(14, 9, 2, tile);
+	map.SetTileAt(14, 10, 1, tile);
+	map.SetTileAt(14, 10, 2, tile);
 }
 
 
@@ -49,23 +66,31 @@ void Engine::render()
 			Tile* r = map.GetTileAt(i, j, yPosition + 1);
 
 			if(r != nullptr && r->type != Map::Tile::empty){
+				TCODConsole::root->setCharBackground(i - 1, j - 1, r->bg);
 				TCODConsole::root->setCharForeground(i-1,j-1,r->color);
 				TCODConsole::root->setChar(i-1, j-1, r->c);
 			}
 			else if(r != nullptr){
 				int g = 0;
 				for (int z = yPosition + 1; z > -1; --z) {
-					if (map.GetTileAt(i, j, z) != nullptr && map.GetTileAt(i, j, z)->type != Tile::empty) {
-						TCODColor col = map.GetTileAt(i,j,z)->color;
-						col.setValue(0.5f - (g * 0.05f));
-						TCODConsole::root->setCharForeground(i-1,j-1,col);
-						TCODConsole::root->setChar(i - 1, j - 1, map.GetTileAt(i, j, z)->c);
+					if (map.GetTileAt(i-g, j-g, z) != nullptr && map.GetTileAt(i-g, j-g, z)->type != Tile::empty) {
+						TCODColor col = map.GetTileAt(i-g,j-g,z)->color;
+						float a = col.getValue();
+						col.setValue(a - (g * a/5));
+
+						TCODColor bg = map.GetTileAt(i - g, j - g, z)->bg;
+						float b = bg.getValue();
+						bg.setValue(b - (g * b / 5));
+
+						TCODConsole::root->setCharForeground(i - 1, j - 1, col);
+						TCODConsole::root->setCharBackground(i - 1, j - 1, bg);
+						TCODConsole::root->setChar(i - 1, j - 1, map.GetTileAt(i-g, j-g, z)->c);
 						break;
 					}
 
 					g++;
 
-					if (g > 10)
+					if (g > 5)
 						break;
 				}
 			}
@@ -75,6 +100,7 @@ void Engine::render()
 		}
 	}
 
+	TCODConsole::root->setCharBackground(x, y, TCODColor::black);
 	TCODConsole::root->setCharForeground(x,y,TCODColor::gold);
 	TCODConsole::root->setChar(x, y, '@');
 }

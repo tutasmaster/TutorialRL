@@ -30,6 +30,7 @@ public:
 		} type = empty;
 
 		TCODColor color = TCODColor::lightGrey;
+		TCODColor bg = TCODColor::black;
 		char c = ' ';
 	};
 
