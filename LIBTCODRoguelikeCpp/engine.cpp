@@ -19,15 +19,36 @@ Engine::Engine() : map(255,255,255)
 	DrawSquareOnMap(map, 6, 6, 8, 8, 4, TILE_FLOOR);
 	DrawSquareOnMap(map, 6, 6, 8, 8, 5, TILE_FLOOR);
 
+	DrawSquareOnMap(map, 20, 5, 10, 10, 1, TILE_WALL);
+	DrawSquareOnMap(map, 20, 5, 10, 10, 2, TILE_WALL);
+	DrawSquareOnMap(map, 20, 5, 10, 10, 3, TILE_WALL);
+	DrawSquareOnMap(map, 20, 5, 10, 10, 4, TILE_WALL);
+	DrawSquareOnMap(map, 20, 5, 10, 10, 5, TILE_WALL);
+
+	DrawSquareOnMap(map, 21, 6, 8, 8, 1, TILE_FLOOR);
+	DrawSquareOnMap(map, 21, 6, 8, 8, 2, TILE_FLOOR);
+	DrawSquareOnMap(map, 21, 6, 8, 8, 3, TILE_FLOOR);
+	DrawSquareOnMap(map, 21, 6, 8, 8, 4, TILE_FLOOR);
+	DrawSquareOnMap(map, 21, 6, 8, 8, 5, TILE_FLOOR);
+
+	DrawSquareOnMap(map, 14, 8, 7, 4, 3, TILE_WALL);
+	DrawSquareOnMap(map, 14, 8, 7, 4, 4, TILE_WALL);
+	DrawSquareOnMap(map, 14, 9, 7, 2, 4, TILE_FLOOR);
+
+	DrawSquareOnMap(map, 21, 6, 8, 8, 6, TILE_WALL);
+	DrawSquareOnMap(map, 22, 7, 6, 6, 7, TILE_WALL);
+	DrawSquareOnMap(map, 23, 8, 4, 4, 8, TILE_WALL);
+	DrawSquareOnMap(map, 24, 9, 2, 2, 9, TILE_WALL);
+
+	DrawSquareOnMap(map, 22, 7, 6, 6, 6, TILE_FLOOR);
+	DrawSquareOnMap(map, 23, 8, 4, 4, 7, TILE_FLOOR);
+	DrawSquareOnMap(map, 24, 9, 2, 2, 8, TILE_FLOOR);
+
 	map.SetTileAt(14, 9, 1,  TILE_FLOOR);
 	map.SetTileAt(14, 10, 1, TILE_FLOOR);
 
 	map.SetTileAt(14, 9, 2,  TILE_EMPTY);
 	map.SetTileAt(14, 10, 2, TILE_EMPTY);
-
-	DrawSquareOnMap(map, 7, 7, 6, 6, 5, TILE_EMPTY);
-	DrawSquareOnMap(map, 8, 8, 4, 4, 4, TILE_EMPTY);
-	DrawSquareOnMap(map, 9, 9, 2, 2, 3, TILE_EMPTY);
 }
 
 
@@ -65,20 +86,30 @@ void Engine::render()
 			else if(r != nullptr){
 				int g = 0;
 				for (int z = yPosition; z > -1; --z) {
-					if (map.GetTileAt(i-g, j-g, z) != nullptr && map.GetTileAt(i-g, j-g, z)->type != Map::Tile::empty) {
-						if (map.GetTileAt(i - g, j - g, z)->shadeLimit < g)
+					Map::Tile * t = map.GetTileAt(i - g, j - g, z);
+					int temp = g;
+					if (g != 0 && map.GetTileAt((i - g) + 1, (j - g) + 1, z) != nullptr && map.GetTileAt((i - g) + 1, (j - g) + 1, z)->type == Map::Tile::wall){
+						t = map.GetTileAt((i - g) + 1, (j - g) + 1, z);
+						temp--;
+					}
+					if (t != nullptr && t->type != Map::Tile::empty) {
+						if (t->shadeLimit < g)
 							break;
-						TCODColor col = map.GetTileAt(i-g,j-g,z)->color;
-						float a = col.getValue();
-						col.setValue((a/(g+1 + (3 - ((map.GetTileAt(i - g, j - g, z)->shadeLimit)/2)))));
 
-						TCODColor bg = map.GetTileAt(i - g, j - g, z)->bg;
+						TCODColor col = t->color;
+						float a = col.getValue();
+						col.setValue((a/(temp+1 + (3 - ((t->shadeLimit)/2)))));
+
+
+						TCODColor bg = t->bg;
 						float b = bg.getValue();
-						bg.setValue((b/(g+1 + (3 - ((map.GetTileAt(i - g, j - g, z)->shadeLimit) / 2)))));
+						bg.setValue((b/(temp+1 + (3 - ((t->shadeLimit) / 2)))));
+
+						
 
 						TCODConsole::root->setCharForeground(i, j, col);
 						TCODConsole::root->setCharBackground(i, j, bg);
-						TCODConsole::root->setChar(i, j, map.GetTileAt(i-g, j-g, z)->c);
+						TCODConsole::root->setChar(i, j, t->c);
 						break;
 					}
 
