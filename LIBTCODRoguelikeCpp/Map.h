@@ -31,6 +31,7 @@ public:
 
 		TCODColor color = TCODColor::lightGrey;
 		TCODColor bg = TCODColor::black;
+		int shadeLimit = 5;
 		char c = ' ';
 	};
 
