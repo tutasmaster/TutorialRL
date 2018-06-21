@@ -5,6 +5,9 @@ Engine::Engine() : map(255,255,255)
 
 	TCODConsole::initRoot(128, 64, "Roguelike");
 
+	PlayerAi p;
+	player.ai = &p;
+
 	SetMapLayer(map, 1, TILE_FLOOR);
 	
 	DrawSquareOnMap(map, 5, 5, 10, 10, 1, TILE_WALL);
@@ -32,7 +35,7 @@ Engine::Engine() : map(255,255,255)
 	DrawSquareOnMap(map, 21, 6, 8, 8, 5, TILE_FLOOR);
 
 	DrawSquareOnMap(map, 14, 8, 7, 4, 3, TILE_WALL);
-	DrawSquareOnMap(map, 14, 8, 7, 4, 4, TILE_WALL);
+	DrawSquareOnMap(map, 14, 8, 2, 4, 4, TILE_WALL);
 	DrawSquareOnMap(map, 14, 9, 7, 2, 4, TILE_FLOOR);
 
 	DrawSquareOnMap(map, 21, 6, 8, 8, 6, TILE_WALL);
@@ -49,6 +52,12 @@ Engine::Engine() : map(255,255,255)
 
 	map.SetTileAt(14, 9, 2,  TILE_EMPTY);
 	map.SetTileAt(14, 10, 2, TILE_EMPTY);
+
+	map.SetTileAt(20, 9, 1, TILE_FLOOR);
+	map.SetTileAt(20, 10, 1, TILE_FLOOR);
+
+	map.SetTileAt(20, 9, 2, TILE_EMPTY);
+	map.SetTileAt(20, 10, 2, TILE_EMPTY);
 }
 
 
@@ -125,9 +134,9 @@ void Engine::render()
 		}
 	}
 
-	TCODConsole::root->setCharBackground(x,y,map.GetTileAt(x,y,yPosition)->bg);
-	TCODConsole::root->setCharForeground(x,y,TCODColor::gold);
-	TCODConsole::root->setChar(x, y, '@');
+	TCODConsole::root->setCharBackground(player.pos.w, player.pos.h,map.GetTileAt(x,y,yPosition)->bg);
+	TCODConsole::root->setCharForeground(player.pos.w, player.pos.h,TCODColor::gold);
+	TCODConsole::root->setChar(player.pos.w, player.pos.h, '@');
 }
 
 void Engine::update()

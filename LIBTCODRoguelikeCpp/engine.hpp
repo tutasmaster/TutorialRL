@@ -4,12 +4,16 @@
 
 #include "Map.h"
 
+#include "Entity.h"
+
 class Engine
 {
 public:
 
 	int x, y;
 	int yPosition;
+
+	Entity player;
 
 	Map map;
 
