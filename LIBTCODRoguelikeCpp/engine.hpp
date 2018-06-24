@@ -2,8 +2,6 @@
 
 #include "Error.h"
 
-#include "Map.h"
-
 #include "Entity.h"
 
 class Engine
@@ -13,7 +11,7 @@ public:
 	int x, y;
 	int yPosition;
 
-	Entity player;
+	std::shared_ptr<Entity> player = std::make_shared<Entity>(Entity());
 
 	Map map;
 

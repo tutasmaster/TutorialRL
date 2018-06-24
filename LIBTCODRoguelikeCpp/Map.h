@@ -4,42 +4,11 @@
 
 #include <vector>
 
-#define TILE_EMPTY 0
-#define TILE_WALL 1
-#define TILE_FLOOR 2
+#include "TileManager.h"
 
 class Map
 {
 public:
-
-	class Tile {
-	public:
-		enum Type {
-			empty,
-			wall,
-			floor
-		} type = empty;
-
-		TCODColor bg = TCODColor::black;
-		TCODColor color = TCODColor::white;
-
-		int shadeLimit = 5;
-
-		char c = '.';
-
-	};
-
-	typedef int TileID;
-
-	class TileManager {
-	public:
-		TileManager();
-		Tile* GetTileData(TileID tile);
-		std::vector<Tile> tiles;
-	};
-
-	TileManager tm;
-
 	class Pos {
 	public:
 		Pos(int w = 0, int h = 0, int d = 0) : w(w), h(h), d(d) {}
@@ -71,6 +40,6 @@ public:
 
 };
 
-void SetMapLayer(Map& m, int l, Map::TileID tile);
+void SetMapLayer(Map& m, int l, TileID tile);
 
-void DrawSquareOnMap(Map& m, int x, int y, int w, int h, int d, Map::TileID tile);
+void DrawSquareOnMap(Map& m, int x, int y, int w, int h, int d, TileID tile);

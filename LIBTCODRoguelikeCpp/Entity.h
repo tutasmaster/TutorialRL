@@ -3,26 +3,28 @@
 #include "Map.h"
 
 #include <string>
+#include <memory>
+
+class Entity;
 
 class Ai {
 public:
-	virtual void OnTick() = 0;
+	virtual void OnTick(std::shared_ptr<Entity> entity) = 0;
 };
 
 class PlayerAi : public Ai {
 public:
-	void OnTick() override;
+	void OnTick(std::shared_ptr<Entity> entity) override;
 };
 
 class Entity
 {
 public:
 	Entity();
-	~Entity();
 
 	Map::Pos pos;
 
-	Ai* ai = nullptr;
+	std::shared_ptr<Ai> ai;
 
 	std::string name = "Entity";
 	char c = 'E';

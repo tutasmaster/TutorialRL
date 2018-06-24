@@ -1,32 +1,7 @@
 #include "Map.h"
 
-Map::TileManager::TileManager() : tiles(){
-	Tile empty;
-	empty.c = ' ';
-	tiles.push_back(empty);
 
-	Tile wall;
-	wall.c = ' ';
-	wall.bg = TCODColor::white;
-	wall.color = TCODColor::black;
-	wall.type = wall.wall;
-	tiles.push_back(wall);
-
-	Tile floor;
-	floor.c = '.';
-	floor.bg = TCODColor::black;
-	floor.color = TCODColor::white;
-	floor.type = floor.floor;
-	tiles.push_back(floor);
-}
-
-Map::Tile* Map::TileManager::GetTileData(Map::TileID tile) {
-	if (tile < tiles.size() && tile > -1)
-		return &tiles.at(tile);
-	return nullptr;
-}
-
-Map::Map(int w = 255, int h = 255, int d = 255) : width(w) , height(h) , depth(d) , tm()
+Map::Map(int w = 255, int h = 255, int d = 255) : width(w) , height(h) , depth(d)
 {
 	arr = new TileID[w*h*d];
 
@@ -41,17 +16,17 @@ Map::~Map()
 	delete[] arr;
 }
 
-Map::Tile* Map::GetTileAt(Pos pos) {
+Tile* Map::GetTileAt(Pos pos) {
 	if ((pos.w > -1 && pos.h > -1 && pos.d > -1) &&
 		(pos.w < width && pos.h < height && pos.d < depth))
-		return tm.GetTileData(arr[pos.w + (pos.h * width) + (pos.d * width * height)]);
+		return tileManager.GetTileData(arr[pos.w + (pos.h * width) + (pos.d * width * height)]);
 	return nullptr;
 }
 
-Map::Tile* Map::GetTileAt(int w, int h, int d) {
+Tile* Map::GetTileAt(int w, int h, int d) {
 	if ((w > -1 && h > -1 && d > -1) &&
 		(w < width && h < height && d < depth))
-		return tm.GetTileData(arr[w + (h * width) + (d * width * height)]);
+		return tileManager.GetTileData(arr[w + (h * width) + (d * width * height)]);
 	return nullptr;
 }
 
@@ -114,7 +89,7 @@ Map::Pos Map::Pos::operator*(int f) {
 	return n;
 }
 
-void SetMapLayer(Map& m, int l, Map::TileID tile) {
+void SetMapLayer(Map& m, int l, TileID tile) {
 	for (int j = 0; j < m.height; j++) {
 		for (int i = 0; i < m.width; i++) {
 			m.SetTileAt(i, j, l, tile);
@@ -122,7 +97,7 @@ void SetMapLayer(Map& m, int l, Map::TileID tile) {
 	}
 }
 
-void DrawSquareOnMap(Map& m, int x, int y, int w, int h, int d, Map::TileID tile) {
+void DrawSquareOnMap(Map& m, int x, int y, int w, int h, int d, TileID tile) {
 	for (int j = y; j < h + y; j++) {
 		for (int i = x; i < w + x; i++) {
 			m.SetTileAt(i, j, d, tile);
