@@ -1,6 +1,6 @@
 #include "engine.hpp"
 
-Engine::Engine() : map(255,255,255)
+Engine::Engine() : map(64,64,64)
 {
 
 	TCODConsole::initRoot(128, 64, "Roguelike");
@@ -84,7 +84,7 @@ void Engine::render()
 
 	for (int j = 0; j < map.height; j++) {
 		for (int i = 0; i < map.width; i++) {
-			Tile* r = map.GetTileAt(i,j,yPosition);
+			Tile* r = map.GetTileAt(i,j,player->pos.d);
 
 			if(r != nullptr && r->type != r->empty){
 				TCODConsole::root->setCharBackground(i, j, r->bg);
@@ -93,12 +93,14 @@ void Engine::render()
 			}
 			else if(r != nullptr){
 				int g = 0;
-				for (int z = yPosition; z > -1; --z) {
+				for (int z = player->pos.d; z > -1; --z) {
 					Tile * t = map.GetTileAt(i - g, j - g, z);
 					int temp = g;
+					bool isHidden = false;
 					if (g != 0 && map.GetTileAt((i - g) + 1, (j - g) + 1, z) != nullptr && map.GetTileAt((i - g) + 1, (j - g) + 1, z)->type == Tile::wall){
 						t = map.GetTileAt((i - g) + 1, (j - g) + 1, z);
 						temp--;
+						isHidden = true;
 					}
 					if (t != nullptr && t->type != Tile::empty) {
 						if (t->shadeLimit < g)
@@ -106,12 +108,12 @@ void Engine::render()
 
 						TCODColor col = t->color;
 						float a = col.getValue();
-						col.setValue((a/(temp+1 + (3 - ((t->shadeLimit)/2)))));
+						col.setValue((a/(temp+1 + (3 - ((t->shadeLimit) / 2)))) - (isHidden * 20));
 
 
 						TCODColor bg = t->bg;
 						float b = bg.getValue();
-						bg.setValue((b/(temp+1 + (3 - ((t->shadeLimit) / 2)))));
+						bg .setValue((b/(temp+1 + (3 - ((t->shadeLimit) / 2)))) - (isHidden*20));
 
 						
 
@@ -128,12 +130,12 @@ void Engine::render()
 				}
 			}
 			else {
-				Err::ConsoleLog("Something awfull happened while drawing the map... run!");
+				//Err::ConsoleLog("Something awfull happened while drawing the map... run!");
 			}
 		}
 	}
 
-	TCODConsole::root->setCharBackground(player->pos.w, player->pos.h,map.GetTileAt(x,y,yPosition)->bg);
+	TCODConsole::root->setCharBackground(player->pos.w, player->pos.h,map.GetTileAt(player->pos.w, player->pos.h, player->pos.d)->bg);
 	TCODConsole::root->setCharForeground(player->pos.w, player->pos.h,TCODColor::gold);
 	TCODConsole::root->setChar(player->pos.w, player->pos.h, '@');
 }

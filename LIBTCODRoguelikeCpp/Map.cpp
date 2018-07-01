@@ -33,7 +33,7 @@ Tile* Map::GetTileAt(int w, int h, int d) {
 
 bool Map::SetTileAt(const Pos p, TileID tile) {
 	if (isTilePosValid(p)) {
-		arr[(p.w - 1) + ((p.h - 1)*width) + ((p.d - 1)*height * width)] = tile;
+		arr[(p.w) + ((p.h)*width) + ((p.d)*height * width)] = tile;
 		return true;
 	}
 	return false;
@@ -41,7 +41,7 @@ bool Map::SetTileAt(const Pos p, TileID tile) {
 
 bool Map::SetTileAt(const int w, const int h, const int d, TileID tile) {
 	if(isTilePosValid(w,h,d)){
-		arr[(w - 1) + ((h - 1)*width) + ((d - 1)*height * width)] = tile;
+		arr[(w) + ((h)*width) + ((d)*height * width)] = tile;
 		return true;
 	}
 	return false;

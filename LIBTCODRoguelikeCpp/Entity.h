@@ -10,11 +10,15 @@ class Entity;
 class Ai {
 public:
 	virtual void OnTick(std::shared_ptr<Entity> entity) = 0;
+	void Move(std::shared_ptr<Entity> entity, int x, int y, int z);
+	void MoveRelative(std::shared_ptr<Entity> entity, int x, int y, int z);
 };
 
 class PlayerAi : public Ai {
 public:
 	void OnTick(std::shared_ptr<Entity> entity) override;
+	bool isDigging = false;
+	bool isBuilding = false;
 };
 
 class Entity
